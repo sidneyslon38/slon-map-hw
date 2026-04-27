@@ -6,6 +6,7 @@
   import Dashboard from '$lib/components/Data/Dashboard.svelte';
   import BigNumber from '$lib/components/Data/BigNumber.svelte';
   import MethodoloyBox from '$lib/components/Article/MethodologyBox.svelte';
+  import Legend from '$lib/components/Maps/Legend.svelte';
 
   let { data } = $props();
   const dayComplaints = data.dayComplaints;
@@ -30,11 +31,15 @@
     pubDate="2026-04-27"
   />
 
-  <p>In data collected from 311 calls in New York City, between January 1, 2025 and today, April 27, 2026, noise complaint data can be viewed by neighborhood.</p>
-  <p>Data has been filtered into daytime complaints, between 6AM and 6PM, and nighttime complaints, between 6PM and 6AM.</p>
+  <p>In data collected from 311 calls between January 1, 2025 and April 27, 2026, noise complaints have been categorized by neighborhood.</p>
+  <p>Data is filtered into daytime complaints, between 6AM and 6PM, and nighttime complaints, between 6PM and 6AM.</p>
+  <p>Use the toggle switch below to view noise complaints that were called in during the day, or at night.</p>
+<p>Overall, there have been <strong>{dayComplaints.features.reduce((sum, d) => sum + d.properties.total_complaints, 0)} daytime</strong> noise complaints, and <strong>{nightComplaints.features.reduce((sum, d) => sum + d.properties.total_complaints, 0)} nighttime</strong> noise complaints since January 1, 2025 in New York City.</p>
+<p>Results show that noise complaints are generally much higher at night, between 6PM and 6AM.</p>
 
 <div class="dashboard">
-<h3><strong>Top 3 Noisiest Neighborhoods:</strong></h3>
+<h3><strong>Top 3 Noisiest Neighborhoods
+  {isNight ? ' at Night' : ' During the Day'}:</strong></h3>
   <Dashboard>
     {#each complaints.features
   .toSorted((a, b) => b.properties.total_complaints - a.properties.total_complaints)
@@ -118,6 +123,36 @@
     />
   </Map>
 
+  <Legend
+    title="Noise Complaints"
+    mode="threshold"
+    items={[
+      {
+        color: '#fffacd',
+        to: 500,
+      },
+      {
+        color: '#ffed4e',
+        from: 500,
+        to: 1000,
+      },
+      {
+        color: '#ffd700',
+        from: 1000,
+        to: 2000,
+      },
+      {
+        color: '#ffb347',
+        from: 2000,
+        to: 5000,
+      },
+      {
+        color: '#ff8c00',
+        from: 5000,
+      },
+    ]}
+  />
+
   <MethodoloyBox>
     <p>Data was sourced from the 311 Service Requests dataset in the Open NYC Data portal. Complaints were filtered by noise-related keywords in the complaint type field, and categorized into daytime and nighttime based on the time of the complaint.</p>
     <p>Neighborhood boundaries were defined using the 2020 NYC Neighborhood Tabulation Areas (NTA) shapefile, which was joined with the complaint data by community district to calculate total complaints per neighborhood. Python and Claude were used for data processing and analysis.</p>
@@ -177,6 +212,7 @@
 
   .dashboard {
     text-align: center;
+    margin-top: 48px;
     gap: 16px;
     margin-bottom: 24px;
   }

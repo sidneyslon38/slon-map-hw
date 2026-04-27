@@ -34,8 +34,8 @@
   <p>In data collected from 311 calls between January 1, 2025 and April 27, 2026, noise complaints have been categorized by neighborhood.</p>
   <p>Data is filtered into daytime complaints, between 6AM and 6PM, and nighttime complaints, between 6PM and 6AM.</p>
   <p>Use the toggle switch below to view noise complaints that were called in during the day, or at night.</p>
-<p>Overall, there have been <strong>{dayComplaints.features.reduce((sum, d) => sum + d.properties.total_complaints, 0)} daytime</strong> noise complaints, and <strong>{nightComplaints.features.reduce((sum, d) => sum + d.properties.total_complaints, 0)} nighttime</strong> noise complaints since January 1, 2025 in New York City.</p>
-<p>Results show that noise complaints are generally much higher at night, between 6PM and 6AM.</p>
+  <p>Overall, there have been <strong>{dayComplaints.features.reduce((sum, d) => sum + d.properties.total_complaints, 0)} daytime</strong> noise complaints, and <strong>{nightComplaints.features.reduce((sum, d) => sum + d.properties.total_complaints, 0)} nighttime</strong> noise complaints since January 1, 2025 in New York City.</p>
+  <p>Results show that noise complaints are generally much higher at night, between 6PM and 6AM.</p>
 
 <div class="dashboard">
 <h3><strong>Top 3 Noisiest Neighborhoods
@@ -45,7 +45,8 @@
   .toSorted((a, b) => b.properties.total_complaints - a.properties.total_complaints)
   .slice(0, 3) as neighborhood}
   <BigNumber
-    label={neighborhood.properties.nta_name}
+    footnote={neighborhood.properties.nta_name}
+    label="total complaints"
     number={neighborhood.properties.total_complaints}
   />
 {/each}

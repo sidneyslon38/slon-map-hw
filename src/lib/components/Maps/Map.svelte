@@ -46,6 +46,9 @@ USAGE EXAMPLE:
     aspectRatio = '4 / 3', // Aspect ratio when no explicit height is given
     caption = '', // Optional caption below the map
     credit = 'OpenFreeMap / OpenStreetMap contributors',
+    minZoom = 0, // Minimum zoom level
+    maxZoom = 24, // Maximum zoom level
+    maxBounds = null, // Bounds to restrict panning [[west, south], [east, north]]
     children, // Snippet for nested MapLayer components
   } = $props();
 
@@ -95,6 +98,9 @@ USAGE EXAMPLE:
           zoom,
           interactive,
           attributionControl: credit ? false : { compact: true },
+          minZoom,
+          maxZoom,
+          maxBounds,
         });
 
         instance.on('style.load', () => {

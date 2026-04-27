@@ -75,6 +75,9 @@ USAGE EXAMPLE:
         q: searchText.trim(),
         format: 'json',
         limit: '5',
+        countrycodes: 'us',
+        viewbox: '-74.3,40.5,-73.7,40.95',
+        bounded: '1',
       });
 
       const response = await fetch(

@@ -1,122 +1,183 @@
-<!--
-@component
-This is your page!
--->
 <script>
-  // Import all the news furniture components
   import ArticleHeader from '$lib/components/Article/ArticleHeader.svelte';
-  import ArticleBody from '$lib/components/Article/ArticleBody.svelte';
-  import Blockquote from '$lib/components/Article/Blockquote.svelte';
-  import Image from '$lib/components/Media/Image.svelte';
-  import RelatedLinks from '$lib/components/Article/RelatedLinks.svelte';
+  import Map from '$lib/components/Maps/Map.svelte';
+  import MapLayer from '$lib/components/Maps/MapLayer.svelte';
+  import Geocoder from '$lib/components/Maps/Geocoder.svelte';
+  import Dashboard from '$lib/components/Data/Dashboard.svelte';
+  import BigNumber from '$lib/components/Data/BigNumber.svelte';
+  import MethodoloyBox from '$lib/components/Article/MethodologyBox.svelte';
 
-  // Article metadata
-  let headline = 'Become a force for good. Join our next class.';
-  let byline = 'NYCity News Service';
-  let pubDate = '2026-01-31';
+  let { data } = $props();
+  const dayComplaints = data.dayComplaints;
+  const nightComplaints = data.nightComplaints;
 
-  // Related stories
-  const relatedStories = [
-    {
-      headline:
-        "How America's top news organizations escape rigid publishing systems to design beautiful data-driven stories on deadline.",
-      href: 'https://palewi.re/docs/coding-the-news/',
-    },
-    {
-      headline:
-        'How to install, configure and use Visual Studio Code, GitHub and Copilot',
-      href: 'https://palewi.re/docs/coding-the-news/scripts/week-1/',
-    },
-    {
-      headline: 'How to publish a website with Node.JS and GitHub Actions',
-      href: 'https://palewi.re/docs/coding-the-news/scripts/week-2/',
-    },
-  ];
+  let longitude = $state(-74.0);
+  let latitude = $state(40.7);
+  let zoom = $state(8);
+  let isNight = $state(false);
+
+  const complaints = $derived(isNight ? nightComplaints : dayComplaints);
+  const theme = $derived(isNight ? 'fiord' : 'positron');
+  const colorScheme = $derived(
+    ['#fffacd', '#ffed4e', '#ffd700', '#ffb347', '#ff8c00', '#ff6347']
+  );
 </script>
 
-<!-- This sets the page title in the browser tab -->
-<svelte:head>
-  <title>{headline} | NYCity News Service</title>
-  <meta
-    name="description"
-    content="At the Craig Newmark Graduate School of Journalism at the City University of New York, change is in our DNA. That comes of being born in 2006, as the digital revolution was transforming our profession in ways none of us could have imagined."
-  />
-</svelte:head>
-
-<!-- Your page content goes here -->
 <div class="container">
-  <!-- Article Header: Headline, byline, and publication date -->
-  <ArticleHeader {headline} {byline} {pubDate} />
-
-  <!-- Lead Image: Animated gif of students at the journalism school -->
-  <Image
-    src="/example-photo.gif"
-    alt="The Craig Newmark Graduate School of Journalism is at 219 West 40th Street in Midtown Manhattan."
-    caption="The Craig Newmark Graduate School of Journalism is at 219 West 40th Street in Midtown Manhattan."
-    credit="Craig Newmark Graduate School of Journalism"
+  <ArticleHeader
+    headline="Tracking NYC Noise Complaints: 2025 to Present"
+    byline="Sidney Slon"
+    pubDate="2026-04-27"
   />
 
-  <!-- Article Body: The main story text with proper typography -->
-  <ArticleBody>
-    <p class="dropcap">
-      At the Craig Newmark Graduate School of Journalism at the City University
-      of New York, change is in our DNA. That comes of being born in 2006, as
-      the digital revolution was transforming our profession in ways none of us
-      could have imagined.
-    </p>
+  <p>In data collected from 311 calls in New York City, between January 1, 2025 and today, April 27, 2026, noise complaint data can be viewed by neighborhood.</p>
+  <p>Data has been filtered into daytime complaints, between 6AM and 6PM, and nighttime complaints, between 6PM and 6AM.</p>
 
-    <p>
-      We fashioned a school to teach the latest storytelling, entrepreneurial,
-      and technological skills alongside reporting, writing, and ethics. Beyond
-      that, we’ve crafted a culture that spurns complacency, that isn’t afraid
-      to pivot before the ground under us shifts.
-    </p>
-
-    <p>
-      Our mission is to serve the public interest – by training new journalists
-      from varied economic, racial, and cultural backgrounds who will bring
-      much-needed diversity to newsrooms, by helping mid-career journalists
-      retool their skills, and by partnering with other media organizations to
-      find new paths to excellence.
-    </p>
-
-    <Blockquote attribution="Craig Newmark Graduate School of Journalism">
-      <p>We invite you to be part of our world.</p>
-    </Blockquote>
-
-    <p>
-      Our low tuition rates, along with the added backing of private donors,
-      allow candidates for our master’s degrees in journalism and engagement
-      journalism to receive a world-class education at an affordable price. We
-      also offer a unique bilingual master’s in journalism for students fluent
-      in English and Spanish.
-    </p>
-
-    <p>
-      Our three media centers provide research, training, thought leadership,
-      industry meet-ups, and financial support for quality journalistic work.
-    </p>
-
-    <p>
-      We also offer a robust professional education program through regular
-      evening and weekend workshops. And we support in-depth reporting projects
-      of professional journalists through fellowship grants.
-    </p>
-
-    <p>
-      Classes are led by accomplished full-time faculty and adjuncts, who tap
-      their networks to help students and graduates find internships, freelance
-      opportunities and — the ultimate prize — jobs.
-    </p>
-
-    <p>
-      At a time when our profession is reeling from financial pressures and lack
-      of trust, the Newmark Graduate School of Journalism is committed to
-      producing the next generation of skilled, ethically minded, and diverse
-      journalists.
-    </p>
-  </ArticleBody>
-
-  <!-- Related Stories: Links to other articles -->
-  <RelatedLinks title="Related Stories" links={relatedStories} />
+<div class="dashboard">
+<h3><strong>Top 3 Noisiest Neighborhoods:</strong></h3>
+  <Dashboard>
+    {#each complaints.features
+  .toSorted((a, b) => b.properties.total_complaints - a.properties.total_complaints)
+  .slice(0, 3) as neighborhood}
+  <BigNumber
+    label={neighborhood.properties.nta_name}
+    number={neighborhood.properties.total_complaints}
+  />
+{/each}
+  </Dashboard>
 </div>
+
+  <div class="toggle">
+    <label class="switch" aria-label="Toggle night mode">
+      <input
+        type="checkbox"
+        checked={isNight}
+        onchange={(e) => (isNight = e.target.checked)}
+      />
+      <span class="slider"></span>
+    </label>
+    <span class="toggle-label">{isNight ? 'Night (6PM - 6AM)' : 'Day (6AM - 6PM)'}</span>
+  </div>
+
+  <Geocoder
+    label="Find your neighborhood"
+    placeholder="Enter an address in New York…"
+    onresult={(result) => {
+      longitude = result.lng;
+      latitude = result.lat;
+      zoom = 15;
+    }}
+  />
+
+  <Map
+    {longitude}
+    {latitude}
+    {zoom}
+    height={600}
+    {theme}
+    credit="OpenFreeMap / OpenStreetMap contributors"
+    minZoom={6}
+    maxZoom={15}
+    maxBounds={[[-74.3, 40.45], [-73.68, 40.95]]}
+  >
+    <MapLayer
+      id="nta-fill"
+      type="fill"
+      data={complaints}
+      paint={{
+        'fill-color': [
+          'step',
+          ['get', 'total_complaints'],
+          colorScheme[0],
+          500,
+          colorScheme[1],
+          1000,
+          colorScheme[2],
+          2000,
+          colorScheme[3],
+          5000,
+          colorScheme[4],
+          10000,
+          colorScheme[5],
+        ],
+        'fill-opacity': 0.7,
+      }}
+      popup={(feature) => {
+        const p = feature.properties;
+        return `<strong>${p.nta_name}</strong><br/>${p.total_complaints} noise complaints`;
+      }}
+    />
+    <MapLayer
+      id="nta-outline"
+      type="line"
+      data={complaints}
+      paint={{
+        'line-color': '#0033a1',
+        'line-width': 0.5,
+      }}
+    />
+  </Map>
+
+  <MethodoloyBox>
+    <p>Data was sourced from the 311 Service Requests dataset in the Open NYC Data portal. Complaints were filtered by noise-related keywords in the complaint type field, and categorized into daytime and nighttime based on the time of the complaint.</p>
+    <p>Neighborhood boundaries were defined using the 2020 NYC Neighborhood Tabulation Areas (NTA) shapefile, which was joined with the complaint data by community district to calculate total complaints per neighborhood. Python and Claude were used for data processing and analysis.</p>
+    <p>Map styling was done using MapLibre GL JS, with a custom color scheme to represent complaint density. The dashboard highlights the top 3 noisiest neighborhoods based on total complaints, filtered to day or night mode.</p>
+  </MethodoloyBox>
+</div>
+
+<style>
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+  }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ccc;
+    transition: background 0.15s ease, transform 0.15s ease;
+    border-radius: 24px;
+  }
+  .slider:before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    transition: transform 0.15s ease;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background: #ff9933;
+  }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+  .toggle-label {
+    font-weight: 600;
+  }
+
+  .dashboard {
+    text-align: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+</style>

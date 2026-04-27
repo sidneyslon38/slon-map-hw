@@ -16,7 +16,7 @@
   .big-number {
     text-align: center;
     padding: var(--spacing-md);
-    background-color: var(--color-accent);
+    background-color: #bc5e01;
     color: var(--color-white);
     border-radius: var(--border-radius-sm);
   }

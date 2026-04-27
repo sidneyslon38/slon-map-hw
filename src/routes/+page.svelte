@@ -108,8 +108,17 @@
         'fill-opacity': 0.7,
       }}
       popup={(feature) => {
-        const p = feature.properties;
-        return `<strong>${p.nta_name}</strong><br/>${p.total_complaints} noise complaints`;
+    const p = feature.properties;
+    return `
+      <div style="font-family: sans-serif; padding: 8px 12px; min-width: 160px;">
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #0033a1;">
+          ${p.nta_name}
+        </div>
+        <div style="font-size: 13px; color: #333;">
+          🔊 <strong>${p.total_complaints.toLocaleString()}</strong> noise complaints
+        </div>
+      </div>
+    `;
       }}
     />
     <MapLayer
@@ -216,4 +225,17 @@
     gap: 16px;
     margin-bottom: 24px;
   }
+
+  :global(.maplibregl-popup-close-button) {
+  font-size: 18px;
+  padding: 4px 8px;
+  color: #333;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+:global(.maplibregl-popup-close-button:hover) {
+  background-color: #f0f0f0;
+  color: #0033a1;
+}
 </style>
